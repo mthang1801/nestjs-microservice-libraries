@@ -1,10 +1,9 @@
 import { RedisModule } from '@app/shared';
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 
-@Global()
 @Module({
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true, envFilePath: './.env' }),

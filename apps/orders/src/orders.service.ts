@@ -1,7 +1,6 @@
 import { PATTERNS, QUEUES, RedisService } from '@app/shared';
 import { Inject, Injectable, InternalServerErrorException, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
-import { Timeout } from '@nestjs/schedule';
 import { lastValueFrom } from 'rxjs';
 @Injectable()
 export class OrdersService implements OnApplicationBootstrap {
@@ -35,16 +34,15 @@ export class OrdersService implements OnApplicationBootstrap {
 		console.log(result);
 	}
 
-	@Timeout(Date.now().toString(), 500)
 	async ___test() {
-		const data = {};
-		const dataArray = [];
-		for (let i = 1; i <= 10; i++) {
-			const val = { id: i, name: `John Doe ${i}` };
-			data[i] = val;
-			dataArray.push(i);
-			dataArray.push(val);
+		try {
+			const k = 'myList';
+			// const value = Array.from({ length: 12 }).map((_, i) => i + 1);
+			// await this.redisService.lpush(k, value);
+			// await this.redisService.rpush(k, -1);
+			console.log(await this.redisService.linsert(k, 'AFTER', '7', '6.7'));
+		} catch (error) {
+			this.logger.error(error.stack);
 		}
-		this.redisService.mset(data);
 	}
 }

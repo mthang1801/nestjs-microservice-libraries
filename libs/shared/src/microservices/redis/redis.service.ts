@@ -22,7 +22,6 @@ export class RedisService {
 	 * @return {Promise<string[]>}
 	 */
 	async getAllKeys(pattern = '*'): Promise<string[]> {
-		this.logger.log(`******************* REDIS GET ALL KEYS [${pattern}] *******************`);
 		return this.getClients.keys(pattern);
 	}
 
@@ -32,7 +31,6 @@ export class RedisService {
 	 * @return {Promise<"OK">}
 	 */
 	async selectIndex(id: number): Promise<'OK'> {
-		this.logger.log(`******************* REDIS GET ALL KEYS [${id}] *******************`);
 		return this.getClients.select(id);
 	}
 

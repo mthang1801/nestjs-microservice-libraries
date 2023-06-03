@@ -1,18 +1,16 @@
+import { isJSON, typeOf } from '@app/common';
+
 export class RedisHelper {
-	static typeOf(value: any): 'string' | 'number' | 'array' | 'object' | 'symbol' | 'bigint' | 'undefined' | 'null' | 'boolean' {
-		return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
-	}
-
 	static serializeJSONValue(value: string | number | object): string {
-		return this.typeOf(value) === 'object' ? JSON.stringify(value) : String(value);
+		return typeOf(value) === 'object' ? JSON.stringify(value) : String(value);
 	}
 
-	static flatArray<T>(arr: T[], depth = 1) {
+	static flatArray<T extends any>(arr: T[], depth = 1) {
 		return arr.flat(depth);
 	}
 
 	static serializeArrayObjectValue(args: any[] | object): Array<string> {
-		switch (this.typeOf(args)) {
+		switch (typeOf(args)) {
 			case 'array':
 				return this.mapArrayIntoSequenceArray(args);
 			case 'object':
@@ -33,5 +31,13 @@ export class RedisHelper {
 			result.push(this.serializeJSONValue(val));
 			return result;
 		}, []);
+	}
+
+	static convertPayloadToMap(payload: object): Map<string, any> {
+		return new Map(Object.entries(payload).map(([key, value]) => [key, JSON.stringify(value)]));
+	}
+
+	static formatValue(val: string) {
+		return isJSON(val) ? JSON.parse(val) : val;
 	}
 }

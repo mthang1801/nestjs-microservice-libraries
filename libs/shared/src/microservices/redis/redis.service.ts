@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Redis, ValueType } from 'ioredis';
+import { BooleanResponse, Redis, ValueType } from 'ioredis';
 import { RedisService as RedisClientService } from 'nestjs-redis';
 import { RedisHelper } from './redis.helper';
 import type { ExpiryMode } from './types/redis.type';
@@ -10,6 +10,27 @@ export class RedisService {
 	protected readonly getClients: Redis = null;
 	constructor(private readonly redisClient: RedisClientService) {
 		this.getClients = this.redisClient.getClient();
+	}
+
+	/**
+	 * Set expire to key
+	 * @param {string} key
+	 * @param {number} expiryTime
+	 * @param {number} expiryMode
+	 * @returns
+	 */
+	async setExpire(key: string, expiryTime: number, expiryMode: ExpiryMode = 'EX'): Promise<BooleanResponse> {
+		return expiryMode === 'EX' ? this.getClients.expire(key, Math.floor(expiryTime)) : this.getClients.pexpire(key, Math.floor(expiryTime));
+	}
+
+	/**
+	 * Set A key expired At
+	 * @param {string} key
+	 * @param {Date | number} expiredAt Date or second
+	 * @return {Promise<BooleanResponse>}
+	 */
+	async setExpireAt(key: string, expiredAt: Date | number): Promise<BooleanResponse> {
+		return this.getClients.expireat(key, typeof expiredAt === 'number' ? Math.floor(expiredAt / 1000) : Math.floor(expiredAt.getTime() / 1000));
 	}
 
 	/*************************************************************
@@ -50,7 +71,7 @@ export class RedisService {
 	 * @param {number} ttl
 	 * @return {Promise<"OK">}
 	 */
-	async set(key: string, value: string | object, expiryMode: ExpiryMode = 'EX', ttl = null): Promise<'OK'> {
+	async set(key: string, value: string | object, ttl = null, expiryMode: ExpiryMode = 'EX'): Promise<'OK'> {
 		if (ttl) return this.getClients.set(key, RedisHelper.serializeJSONValue(value), expiryMode, ttl);
 		return this.getClients.set(key, RedisHelper.serializeJSONValue(value));
 	}
@@ -121,7 +142,7 @@ export class RedisService {
 	 * @param {string[]} values
 	 * @return {Promise<number>}
 	 */
-	async unshift(key: string, ...values: ValueType[]): Promise<number> {
+	async listUnshift(key: string, ...values: ValueType[]): Promise<number> {
 		return await this.getClients.lpush(key, RedisHelper.flatArray(values));
 	}
 	/**
@@ -130,7 +151,7 @@ export class RedisService {
 	 * @param {string[]} values
 	 * @return {Promise<number>}
 	 */
-	async push(key: string, ...values: ValueType[]): Promise<number> {
+	async listPush(key: string, ...values: ValueType[]): Promise<number> {
 		return await this.getClients.rpush(key, RedisHelper.flatArray(values));
 	}
 
@@ -141,7 +162,7 @@ export class RedisService {
 	 * @param endIdx
 	 * @returns
 	 */
-	async slice(key: string, startIdx: number, endIdx: number): Promise<string[]> {
+	async listSlice(key: string, startIdx: number, endIdx: number): Promise<string[]> {
 		return this.getClients.lrange(key, startIdx, endIdx);
 	}
 
@@ -150,7 +171,7 @@ export class RedisService {
 	 * @param key
 	 * @returns
 	 */
-	async shift(key: string): Promise<string> {
+	async listShift(key: string): Promise<string> {
 		return this.getClients.lpop(key);
 	}
 
@@ -159,7 +180,7 @@ export class RedisService {
 	 * @param key
 	 * @returns
 	 */
-	async pop(key: string): Promise<string> {
+	async listPop(key: string): Promise<string> {
 		return this.getClients.rpop(key);
 	}
 
@@ -170,11 +191,11 @@ export class RedisService {
 	 * @param value
 	 * @returns
 	 */
-	async lset(key: string, index: number, value: string) {
+	async listSet(key: string, index: number, value: string) {
 		return this.getClients.lset(key, index, value);
 	}
 
-	async linsert(key: string, direction: 'BEFORE' | 'AFTER', pivot: string, value: string): Promise<number> {
+	async listInsert(key: string, direction: 'BEFORE' | 'AFTER', pivot: string, value: string): Promise<number> {
 		return this.getClients.linsert(key, direction, pivot, value);
 	}
 
@@ -183,7 +204,79 @@ export class RedisService {
 	 * @param {string} key
 	 * @return {Promise<number>}
 	 */
-	async llen(key: string): Promise<number> {
+	async listLength(key: string): Promise<number> {
 		return this.getClients.llen(key);
+	}
+
+	/************************************************************
+	 **************************** HASH ***************************
+	 *************************************************************/
+
+	/**
+	 * Set hash value by key
+	 * @param key
+	 * @param payload
+	 * @returns
+	 */
+	async hashSet(key: string, payload: object): Promise<number> {
+		return this.getClients.hset(key, RedisHelper.convertPayloadToMap(payload));
+	}
+
+	/**
+	 * Get hash values by key
+	 * @param key
+	 * @returns
+	 */
+	async hashGetAll(key: string): Promise<any> {
+		const responseData = await this.getClients.hgetall(key);
+		return Object.entries(responseData).reduce((result: object, [key, val]: [string, any]) => {
+			result[key] = RedisHelper.formatValue(val);
+			return result;
+		}, {});
+	}
+
+	/**
+	 * Get multiple values by key and args in hash
+	 * @param {string} key
+	 * @param {string[]} fields
+	 * @return {Promise<Record<string, string>>}
+	 */
+	async hashGetValuesByKeys(key: string, ...fields: ValueType[]) {
+		const listArgs = RedisHelper.flatArray<ValueType>(fields);
+		const responseData = await this.getClients.hmget(key, listArgs);
+		return listArgs.reduce((result, key, i) => {
+			result[key] = RedisHelper.formatValue(responseData[i]);
+			return result;
+		}, {});
+	}
+
+	/**
+	 * Get hash keys
+	 * @param {string} key
+	 * @return {Promise<string[]>}
+	 */
+	async hashGetKeys(key: string): Promise<string[]> {
+		return this.getClients.hkeys(key);
+	}
+
+	/**
+	 * Incremnent a number of field in hash key
+	 * @param {string} key
+	 * @param {string} field
+	 * @param {number} increment
+	 * @param {INT | FLOAT} type
+	 * @return {Promise<number>}
+	 */
+	async hashIncrBy(key: string, field: string, increment: number, type: 'INTEGER' | 'FLOAT' = 'INTEGER'): Promise<number> {
+		return type === 'INTEGER' ? this.getClients.hincrby(key, field, increment) : this.getClients.hincrbyfloat(key, field, increment);
+	}
+
+	/**
+	 * Get the field size in hash key
+	 * @param key
+	 * @returns
+	 */
+	async hashFieldLength(key: string): Promise<number> {
+		return this.getClients.hlen(key);
 	}
 }

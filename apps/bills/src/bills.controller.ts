@@ -1,4 +1,4 @@
-import { ExceptionFilter } from '@app/common/filter/all-exception.filter';
+import { ExceptionFilter } from '@app/common/filters/all-exception.filter';
 import { PATTERNS } from '@app/shared';
 import { Controller, UseFilters } from '@nestjs/common';
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext, RpcException } from '@nestjs/microservices';

@@ -41,6 +41,7 @@
     "joi": "^17.9.2",
     "kafkajs": "^2.2.4",
     "lodash": "^4.17.21",
+    "moment": "^2.29.4",
     "mongodb": "^5.5.0",
     "mongoose": "^7.2.2",
     "nestjs-redis": "github:GyanendroKh/nestjs-redis#nest8-fix",

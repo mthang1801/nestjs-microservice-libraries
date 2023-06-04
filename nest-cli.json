@@ -108,6 +108,24 @@
       "compilerOptions": {
         "tsConfigPath": "apps/rmq-transporter/tsconfig.app.json"
       }
+    },
+    "exceljs": {
+      "type": "application",
+      "root": "apps/exceljs",
+      "entryFile": "main",
+      "sourceRoot": "apps/exceljs/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/exceljs/tsconfig.app.json"
+      }
+    },
+    "events": {
+      "type": "application",
+      "root": "apps/events",
+      "entryFile": "main",
+      "sourceRoot": "apps/events/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/events/tsconfig.app.json"
+      }
     }
   }
 }

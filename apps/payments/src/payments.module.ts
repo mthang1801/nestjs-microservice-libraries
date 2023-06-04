@@ -1,12 +1,12 @@
 import { CommonModule } from '@app/common';
 import { RMQClientModule } from '@app/shared';
 import { Module, forwardRef } from '@nestjs/common';
-import { BillsController } from './bills.controller';
-import { BillsService } from './bills.service';
+import { PaymentsController } from './payments.controller';
+import { PaymentsService } from './payments.service';
 
 @Module({
 	imports: [forwardRef(() => CommonModule), RMQClientModule],
-	controllers: [BillsController],
-	providers: [BillsService]
+	controllers: [PaymentsController],
+	providers: [PaymentsService]
 })
-export class BillsModule {}
+export class PaymentsModule {}

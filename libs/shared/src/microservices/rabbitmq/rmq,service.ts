@@ -5,7 +5,7 @@ import { RmqContext, RmqOptions, Transport } from '@nestjs/microservices';
 export class RMQService {
 	constructor(private readonly configService: ConfigService) {}
 
-	getRmqOptions(queue: string, noAck = false): RmqOptions {
+	getRmqOptions(queue: string, noAck = true): RmqOptions {
 		return {
 			transport: Transport.RMQ,
 			options: {

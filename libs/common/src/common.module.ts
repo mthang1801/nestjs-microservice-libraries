@@ -1,5 +1,5 @@
 import { RedisModule } from '@app/shared';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -15,7 +15,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 			inject: [ConfigService]
 		}),
 		ScheduleModule.forRoot(),
-		RedisModule
+		forwardRef(() => RedisModule)
 	],
 	providers: [],
 	exports: []

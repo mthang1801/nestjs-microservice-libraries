@@ -1,4 +1,5 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { interval, map, take } from 'rxjs';
 import { Socket } from 'socket.io';
 
 @WebSocketGateway(Number(process.env.CHAT_GATEWAYS_PORT), { cors: '*', transports: ['websocket'] })
@@ -52,5 +53,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	private getSocketIdsByUser(userId) {
 		return this.users.find((user) => String(user.id) === String(userId))?.socketIds || [];
+	}
+
+	@SubscribeMessage('server-listen-processing-request')
+	async handleProcessingRequest(@ConnectedSocket() client: Socket) {
+		return interval(1000).pipe(
+			map((data) => {
+				console.log(data);
+				client.emit('server-send-processing', { response: data });
+			}, take(10))
+		);
 	}
 }

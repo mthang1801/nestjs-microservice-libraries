@@ -37,15 +37,6 @@
         "tsConfigPath": "apps/bills/tsconfig.app.json"
       }
     },
-    "products": {
-      "type": "application",
-      "root": "apps/products",
-      "entryFile": "main",
-      "sourceRoot": "apps/products/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/products/tsconfig.app.json"
-      }
-    },
     "common": {
       "type": "library",
       "root": "libs/common",
@@ -89,6 +80,33 @@
       "sourceRoot": "apps/mysql-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/mysql-service/tsconfig.app.json"
+      }
+    },
+    "payments": {
+      "type": "application",
+      "root": "apps/payments",
+      "entryFile": "main",
+      "sourceRoot": "apps/payments/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/payments/tsconfig.app.json"
+      }
+    },
+    "nats-service": {
+      "type": "application",
+      "root": "apps/nats-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/nats-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/nats-service/tsconfig.app.json"
+      }
+    },
+    "rmq-transporter": {
+      "type": "application",
+      "root": "apps/rmq-transporter",
+      "entryFile": "main",
+      "sourceRoot": "apps/rmq-transporter/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/rmq-transporter/tsconfig.app.json"
       }
     }
   }

@@ -72,6 +72,24 @@
       "compilerOptions": {
         "tsConfigPath": "apps/chat/tsconfig.app.json"
       }
+    },
+    "redis-service": {
+      "type": "application",
+      "root": "apps/redis-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/redis-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/redis-service/tsconfig.app.json"
+      }
+    },
+    "mysql-service": {
+      "type": "application",
+      "root": "apps/mysql-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/mysql-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/mysql-service/tsconfig.app.json"
+      }
     }
   }
 }

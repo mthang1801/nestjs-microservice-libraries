@@ -7,5 +7,6 @@ async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(ExceljsModule);
 	app.useStaticAssets(join(__dirname, '..', '..', 'public'));
 	await app.listen(3005);
+	console.log(`server listening ${await app.getUrl()}`);
 }
 bootstrap();
